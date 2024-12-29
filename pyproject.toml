@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "to do cli"
+version = "0.1.0"
+description = "A simple to do cli app."
+authors = ["Eric Castillo <coqmos@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+inquirer = "^3.4.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
