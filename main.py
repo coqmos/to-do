@@ -1,9 +1,11 @@
 import argparse
 import file_manager
 import inquirer
+from inquirer.themes import GreenPassion
+
 
 def generate_questions()-> list:
-    to_do_items = format_list(file_manager.get_list())
+    to_do_items = file_manager.get_list()
     questions = [
             inquirer.Checkbox(
                 'to_do',
@@ -13,20 +15,10 @@ def generate_questions()-> list:
             inquirer.List(
                 "choice",
                 message="What do you want to do?",
-                choices=['Add', 'Delete', 'Edit', 'Mark Done',],
+                choices=['Add', 'Edit', 'Mark Done',],
                 ),]
 
     return questions
-
-
-def format_list(items:list) -> list:
-    formatted_items = []
-    for i in items:
-        text = i['item']
-        if i['status'] == 1:
-            text =' ' + text
-        formatted_items.append(text)
-    return formatted_items
 
 
 def handle_arguments():
@@ -34,15 +26,43 @@ def handle_arguments():
     parser.add_argument('--new', help = "Add a new item")
     args = parser.parse_args()
     if None != args.new:
-        file_manager.add_item(args.new)
-
-def handle_delete(items: list):
-    print('Lets delete')
+        items = file_manager.add_item(args.new)
+        file_manager.save(items)
 
 if __name__ == "__main__":
     handle_arguments()
-    answers = inquirer.prompt(generate_questions())
-    assert answers is not None
-    if 'Delete' == answers['choice']:
-        print(answers['choice'])
 
+    answers = inquirer.prompt(generate_questions(), theme=GreenPassion())
+    assert answers is not None
+    
+    if 'Mark Done' == answers['choice']:
+        items = file_manager.delete_items(answers['to_do'])
+        file_manager.save(items)
+        print("Items Removed")
+    if 'Add' == answers['choice']:
+        question = [
+            inquirer.Text(
+                'add_item',
+                message="What would you like to add?",
+            )
+        ]
+        answer = inquirer.prompt(question)
+        assert answer is not None
+
+        items = file_manager.add_item(answer['add_item'])
+        file_manager.save(items)
+        print("Item Added")
+    if 'Edit' == answers['choice']:
+        question = [
+            inquirer.Text(
+                'edit_item',
+                message="Edit item",
+                default=answers['to_do'][0]
+            )
+        ]
+        answer = inquirer.prompt(question)
+        assert answer is not None
+
+        items = file_manager.update_item(answer['edit_item'])
+        file_manager.save(items)
+        print("Updated")
