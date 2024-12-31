@@ -53,16 +53,19 @@ if __name__ == "__main__":
         file_manager.save(items)
         print("Item Added")
     if 'Edit' == answers['choice']:
+        selected_item = answers['to_do'][0]
+        assert selected_item is not None
+
         question = [
             inquirer.Text(
                 'edit_item',
                 message="Edit item",
-                default=answers['to_do'][0]
+                default=selected_item
             )
         ]
         answer = inquirer.prompt(question)
         assert answer is not None
 
-        items = file_manager.update_item(answer['edit_item'])
+        items = file_manager.merge_item(answer['edit_item'], selected_item)
         file_manager.save(items)
         print("Updated")
